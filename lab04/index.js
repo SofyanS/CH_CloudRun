@@ -1,4 +1,4 @@
-//const CLIENT_ID = '[CLIENT_ID]';
+//const CLIENT_ID = 'REPLACE_CLIENTID';
 const CLIENT_ID = '464807804188-ma1l2c690k48nj506a1jpg05fqj4c98p.apps.googleusercontent.com';
 const {OAuth2Client} = require('google-auth-library');
 const client = new OAuth2Client(CLIENT_ID);
