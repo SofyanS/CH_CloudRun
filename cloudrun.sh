@@ -1,6 +1,6 @@
 # Create Oauth Screena and Creds. Get client ID and pass as arg
 # Follow GSuite Lab Instructinos on creating an Oauth screen and  client ID with different inputs
-$clientID=$1
+clientID=$1
 
 # Enable all APIs do this seperately in P1
 gcloud services enable run.googleapis.com
