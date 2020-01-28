@@ -1,8 +1,3 @@
-//const CLIENT_ID = 'REPLACE_CLIENTID';
-const CLIENT_ID = '464807804188-ma1l2c690k48nj506a1jpg05fqj4c98p.apps.googleusercontent.com';
-const {OAuth2Client} = require('google-auth-library');
-const client = new OAuth2Client(CLIENT_ID);
-
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -20,18 +15,7 @@ app.get('/v1', async (req, res) => {
   res.json({status: 'running'});
 });
 
-app.get('/v1/customer', async (req, res) => {
-  res.status(400);
-  res.json({status: 'fail', data: {title: `You must include a Customer ID`}});
-});
-
 app.get('/v1/customer/:id', async (req, res) => {
-  const uid = await getUid(req);
-  if (! await hasRestApiAccess(uid)) {
-    res.status(403);
-    res.json({status: 'fail', data: {title: 'User does not have access'}});
-    return;
-  }
   const customerId = req.params.id;
   const customer = await getCustomer(customerId);
   if (customer) {
@@ -54,42 +38,12 @@ async function getCustomer(id) {
 }
 
 async function getAmounts(customer) {
-  let retVal = {proposed:0, approved:0, rejected:0};
-  let collRef = db.collection(`customers/${customer.email}/treatments`);
+  const retVal = {proposed:0, approved:0, rejected:0};
+  const collRef = db.collection(`customers/${customer.email}/treatments`);
   const querySnapshot = await collRef.get();
   querySnapshot.forEach(docSnapshot => {
     const treatment = docSnapshot.data();
     retVal[treatment.status] += treatment.cost;
   });
   return retVal;
-}
-
-async function getUid(req) {
-  const idToken = req.headers['authorization'];
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken: idToken,
-      audience: CLIENT_ID
-    });
-    const payload = ticket.getPayload();
-    const uid = payload['sub'];
-    console.log(`uid: ${uid}`);
-    return uid;
-  }
-  catch (ex) {
-    console.error(ex);
-    return '';
-  }
-}
-
-async function hasRestApiAccess(uid) {
-  const doc = await db.collection('admin').doc('users').get();
-  if (doc.exists) {
-    const users = doc.data();
-    if (users.hasOwnProperty('rest-api-users')) {
-      return users['rest-api-users'].includes(uid);
-    }
-  }
-  console.error('Did not find admin/users/rest-api-users in Firestore');
-  return false;
 }

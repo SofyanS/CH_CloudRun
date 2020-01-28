@@ -1,4 +1,4 @@
-const SERVICE_URL = 'https://rest-api-oxrc6jexla-uc.a.run.app';
+const SERVICE_URL = 'REPLACE_URL';
 let idToken;
 
 function onSignIn(googleUser) {

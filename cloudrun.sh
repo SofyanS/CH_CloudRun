@@ -40,7 +40,7 @@ gcloud beta run deploy rest-api \
 # Add a web page that lets users sign in and call the REST API
 URL=$(gcloud beta run services describe rest-api --platform managed --region us-central1 --format "value(status.url)")
 sed -i "s~REPLACE_URL~$URL~g" website/index.js
-sed -i "s~REPLACE_CLIENTID~$clientID~g" website/index.js
+sed -i "s~REPLACE_CLIENTID~$clientID~g" index.js
 
 # Create a new GCS bucket with name as <PROJECT_ID>-public
 gsutil mb gs://$DEVSHELL_PROJECT_ID-public
@@ -52,6 +52,8 @@ gsutil cp * gs://$DEVSHELL_PROJECT_ID-public
 
 # Add an authentication check to the REST API code
 cd ..
+rm index.js
+mv auth_check.js index.js
 gcloud builds submit \
   --tag gcr.io/$GOOGLE_CLOUD_PROJECT/rest-api
 
