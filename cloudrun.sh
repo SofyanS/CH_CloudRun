@@ -6,6 +6,7 @@ $clientID=$1
 gcloud services enable run.googleapis.com
 
 # Build container with cloud run
+cd pet-theory/lab04
 gcloud builds submit \
   --tag gcr.io/$DEVSHELL_PROJECT_ID/rest-api
 
