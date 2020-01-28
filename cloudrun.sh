@@ -1,5 +1,6 @@
-# Create Oauth Screena and Creds. Get client ID and pass as arg
-# Follow GSuite Lab Instructinos on creating an Oauth screen and  client ID with different inputs
+# Before Starting lab
+	# Create Oauth Screen and Creds. Get client ID and pass as arg
+	# Create Firestore Native Database
 clientID=$1
 
 # Enable all APIs do this seperately in P1
