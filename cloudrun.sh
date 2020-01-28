@@ -1,12 +1,13 @@
 # Before Starting lab
-	# Create Oauth Screen and Creds. Get client ID and pass as arg
+	# Create an OAuth consent screen for your app
+    # Create OAuth client ID (Then Copy Client ID)
 	# Create Firestore Native Database
 clientID=$1
 
 # Enable all APIs do this seperately in P1
 gcloud services enable run.googleapis.com
 
-# Build container with cloud run
+# Build a REST API with Google Container Registry and Cloud Run
 cd pet-theory/lab04
 gcloud builds submit \
   --tag gcr.io/$DEVSHELL_PROJECT_ID/rest-api
@@ -17,20 +18,20 @@ gcloud beta run deploy rest-api \
 --region us-central1 \
 --allow-unauthenticated
 
-#Create a new GCS bucket with name as <PROJECT_ID>-customer then copy the data in
+# Create a new GCS bucket with name as <PROJECT_ID>-customer
 gsutil mb gs://$DEVSHELL_PROJECT_ID-customer
-gsutil cp -r gs://spls/gsp645/2019-10-06T20:10:37_43617/ gs://$DEVSHELL_PROJECT_ID-customer
 
-# Import the data to firestore, but first create a Native Mode Firestore
+# Import customer data into Firestore Database (but first create a Native Mode Firestore)
+gsutil cp -r gs://spls/gsp645/2019-10-06T20:10:37_43617/ gs://$DEVSHELL_PROJECT_ID-customer
 gcloud beta firestore import gs://$DEVSHELL_PROJECT_ID-customer/2019-10-06T20:10:37_43617
 
 # Connect REST API to Firestore Database
-# Build and deploy new version of REST API
+# Build and deploy new version of REST API. Have a second index.js in case it's an issue with the code?
 gcloud builds submit \
-  --tag gcr.io/$PROJECT_ID/rest-api
+  --tag gcr.io/$DEVSHELL_PROJECT_ID/rest-api
 
 gcloud beta run deploy rest-api \
---image gcr.io/$PROJECT_ID/rest-api \
+--image gcr.io/$DEVSHELL_PROJECT_ID/rest-api \
 --platform managed \
 --region us-central1 \
 --allow-unauthenticated
@@ -41,11 +42,13 @@ URL=$(gcloud beta run services describe rest-api --platform managed --region us-
 sed -i "s~REPLACE_URL~$URL~g" website/index.js
 sed -i "s~REPLACE_CLIENTID~$clientID~g" website/index.js
 
-# Create new GCS bucket
-gsutil mb gs://$PROJECT_ID-public
-gsutil iam ch allUsers:objectViewer gs://$PROJECT_ID-public
+# Create a new GCS bucket with name as <PROJECT_ID>-public
+gsutil mb gs://$DEVSHELL_PROJECT_ID-public
+gsutil iam ch allUsers:objectViewer gs://$DEVSHELL_PROJECT_ID-public
+
+# Copy website directory content into <PROJECT_ID>-public bucket
 cd website
-gsutil cp * gs://$PROJECT_ID-public
+gsutil cp * gs://$DEVSHELL_PROJECT_ID-public
 
 # Add an authentication check to the REST API code
 cd ..
@@ -60,11 +63,12 @@ gcloud beta run deploy rest-api \
 
 # Skipped NPM Installs or steps
 # npm install google-auth-library
-# TODO: Consider putting this into my own repo with NPM install already ran
+# npm install express
+# npm install @google-cloud/firestore
+# npm install cors
+
+# Other skipped commands
 # PROJECT_ID=$(gcloud config get-value project)
 # git clone https://github.com/rosera/pet-theory.git
 # cd pet-theory/lab04
-# npm install express
-# TODO: Install packages for firestore and cors keep this in the repo
-# npm install @google-cloud/firestore
-# npm install cors
+
