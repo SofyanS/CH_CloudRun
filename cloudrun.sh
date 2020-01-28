@@ -3,6 +3,7 @@
     # Create OAuth client ID (Then Copy Client ID)
 	# Create Firestore Native Database
 clientID=$1
+cd pet-theory/lab04
 
 # Enable all APIs do this seperately
 gcloud services enable run.googleapis.com
@@ -20,7 +21,6 @@ gcloud beta firestore import gs://$DEVSHELL_PROJECT_ID-customer/2019-10-06T20:10
 
 # Build a REST API with Google Container Registry and Cloud Run
 # Connect REST API to Firestore Database
-cd pet-theory/lab04
 gcloud builds submit \
   --tag gcr.io/$DEVSHELL_PROJECT_ID/rest-api
 
@@ -41,8 +41,7 @@ sed -i "s~REPLACE_URL~$URL~g" website/index.js
 sed -i "s~REPLACE_CLIENTID~$clientID~g" index.js
 
 # Copy modified website directory content into <PROJECT_ID>-public bucket
-cd website
-gsutil cp * gs://$DEVSHELL_PROJECT_ID-public
+gsutil cp website/* gs://$DEVSHELL_PROJECT_ID-public
 
 gcloud builds submit \
   --tag gcr.io/$GOOGLE_CLOUD_PROJECT/rest-api
